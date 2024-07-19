@@ -12,6 +12,8 @@ object StatusConverter {
     id = StatusId(json.id),
     account = AccountConverter.convertToDomainModel(json.account),
     content = json.content ?: "",
-    attachmentMediaList =  MediaConverter.convertToDomainModel(json.attachmentMediaList)
+    attachmentMediaList =  json.attachmentMediaList?.let {
+      MediaConverter.convertToDomainModel(it)
+    } ?: listOf()
   )
 }

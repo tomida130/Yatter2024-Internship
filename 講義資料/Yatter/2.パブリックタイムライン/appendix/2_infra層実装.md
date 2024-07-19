@@ -50,7 +50,7 @@ GET /timelines/public
       "id": 0,
       "username": "john",
       "display_name": "ジョン",
-      "create_at": "2023-05-22T05:23:19.017Z",
+      "created_at": "2023-05-22T05:23:19.017Z",
       "followers_count": 52,
       "following_count": 128,
       "note": "string",
@@ -58,7 +58,7 @@ GET /timelines/public
       "header": "string"
     },
     "content": "ピタ ゴラ スイッチ♪",
-    "create_at": "2023-05-22T05:23:19.017Z",
+    "created_at": "2023-05-22T05:23:19.017Z",
     "media_attachments": [
       {
         "id": 123,
@@ -85,7 +85,7 @@ GET /timelines/public
   "id": 0,
   "username": "string",
   "display_name": "string",
-  "create_at": "2019-04-23T04:42:43.836Z",
+  "created_at": "2019-04-23T04:42:43.836Z",
   "note": "string",
   "avatar": "string",
   "following_count": 100,
@@ -107,9 +107,9 @@ data class AccountJson(
   val note: String?,
   val avatar: String?,
   val header: String?,
-  val following_count: Int,
-  val followers_count: Int,
-  val create_at: String,
+  val following_count: Int?,
+  val followers_count: Int?,
+  val created_at: String,
 )
 ```
 
@@ -121,7 +121,7 @@ Androidをはじめとするモバイルアプリ開発において、アプリ�
 そのため、修正が入ってもアプリの修正・リリースをしなくとも機能するように意識して実装することが多くあります。  
 今回のidをintではなくStringで最初から扱うのもそういった理由からきています。  
 
-このままのクラス実装でも動作するのですが、一般的にAndroidの開発で推奨されているコーディング規約には変数の命名は`camelCase`であるため`display_name`や`create_at`という命名は規約違反となっています。そのため、下記のように`camelCase`に修正します。  
+このままのクラス実装でも動作するのですが、一般的にAndroidの開発で推奨されているコーディング規約には変数の命名は`camelCase`であるため`display_name`や`created_at`という命名は規約違反となっています。そのため、下記のように`camelCase`に修正します。  
 
 ```Kotlin
 package com.dmm.bootcamp.yatter2024.infra.api.json
@@ -133,13 +133,13 @@ data class AccountJson(
   val note: String?,
   val avatar: String?,
   val header: String?,
-  val followingCount: Int,
-  val followersCount: Int,
-  val createAt: String,
+  val followingCount: Int?,
+  val followersCount: Int?,
+  val createdAt: String,
 )
 ```
 
-ただしこれでは動きません。実際のJsonでは`display_name`や`created_at`というキーであるのに対して、クラスでは`displayName`、`createAt`という違う文字列になっているので、シリアライザが対応関係を解決することができません。  
+ただしこれでは動きません。実際のJsonでは`display_name`や`created_at`というキーであるのに対して、クラスでは`displayName`、`createdAt`という違う文字列になっているので、シリアライザが対応関係を解決することができません。  
 この対応関係を揃えるための機能を`Moshi`が用意しているため、`AccountJson`クラスは下記のように修正します。  
 
 ```Kotlin
@@ -153,9 +153,9 @@ data class AccountJson(
   @Json(name = "note") val note: String?,
   @Json(name = "avatar") val avatar: String?,
   @Json(name = "header") val header: String?,
-  @Json(name = "following_count") val followingCount: Int,
-  @Json(name = "followers_count") val followersCount: Int,
-  @Json(name = "create_at") val createAt: String
+  @Json(name = "following_count") val followingCount: Int?,
+  @Json(name = "followers_count") val followersCount: Int?,
+  @Json(name = "created_at") val createdAt: String
 )
 ```
 
@@ -174,9 +174,9 @@ data class AccountJson(
   val note: String?,
   val avatar: String?,
   val header: String?,
-  @Json(name = "following_count") val followingCount: Int,
-  @Json(name = "followers_count") val followersCount: Int,
-  @Json(name = "create_at") val createAt: String
+  @Json(name = "following_count") val followingCount: Int?,
+  @Json(name = "followers_count") val followersCount: Int?,
+  @Json(name = "created_at") val createdAt: String
 )
 ```
 
@@ -211,7 +211,7 @@ data class StatusJson(
   val id: String,
   val account: AccountJson,
   val content: String?,
-  @Json(name = "create_at") val createAt: String,
+  @Json(name = "created_at") val createdAt: String,
   @Json(name = "media_attachments") val attachmentMediaList: List<MediaJson>?,
 )
 ```
@@ -528,7 +528,7 @@ import java.net.URL
 
 object AccountConverter {
   fun convertToDomainModel(
-    jsonList: List<AccountJson>
+    jsonList: List<AccountJson>,
   ): List<Account> = jsonList.map { convertToDomainModel(it) }
 
   fun convertToDomainModel(json: AccountJson): Account = AccountImpl(
@@ -536,10 +536,31 @@ object AccountConverter {
     username = Username(json.username),
     displayName = json.displayName,
     note = json.note,
-    avatar = URL(BuildConfig.API_URL + "/v1/" + json.avatar),
-    header = URL(BuildConfig.API_URL + "/v1/" + json.header),
-    followingCount = json.followingCount,
-    followerCount = json.followersCount,
+    avatar = json.avatar?.takeIf { it.isNotEmpty() }?.let { URL(it) },
+    header = json.header?.takeIf { it.isNotEmpty() }?.let { URL(it) },
+    followingCount = json.followingCount ?: 0,
+    followerCount = json.followersCount ?: 0,
+  )
+}
+```
+
+### MediaConverter
+```Kotlin
+package com.dmm.bootcamp.yatter2024.infra.domain.converter
+
+import com.dmm.bootcamp.yatter2024.domain.model.Media
+import com.dmm.bootcamp.yatter2024.domain.model.MediaId
+import com.dmm.bootcamp.yatter2024.infra.api.json.MediaJson
+
+object MediaConverter {
+  fun convertToDomainModel(jsonList: List<MediaJson>): List<Media> =
+    jsonList.map { convertToDomainModel(it) }
+
+  private fun convertToDomainModel(json: MediaJson): Media = Media(
+    id = MediaId(value = json.id),
+    type = json.type,
+    url = json.url,
+    description = json.description,
   )
 }
 ```
@@ -548,8 +569,8 @@ object AccountConverter {
 ```Kotlin
 package com.dmm.bootcamp.yatter2024.infra.domain.converter
 
-import com.dmm.bootcamp.yatter2024.domain.Status
-import com.dmm.bootcamp.yatter2024.domain.StatusId
+import com.dmm.bootcamp.yatter2024.domain.model.Status
+import com.dmm.bootcamp.yatter2024.domain.model.StatusId
 import com.dmm.bootcamp.yatter2024.infra.api.json.StatusJson
 
 object StatusConverter {
@@ -560,7 +581,9 @@ object StatusConverter {
     id = StatusId(json.id),
     account = AccountConverter.convertToDomainModel(json.account),
     content = json.content ?: "",
-    attachmentMediaList = MediaConverter.convertToDomainModel(json.attachmentMediaList),
+    attachmentMediaList =  json.attachmentMediaList?.let {
+      MediaConverter.convertToDomainModel(it)
+    } ?: listOf()
   )
 }
 ```
@@ -667,10 +690,10 @@ val jsonList = listOf(
       header = "https://www.google.com",
       followingCount = 100,
       followersCount = 200,
-      createAt = "2023-06-02T12:44:35.030Z"
+      createdAt = "2023-06-02T12:44:35.030Z"
     ),
     content = "content",
-    createAt = "2023-06-02T12:44:35.030Z",
+    createdAt = "2023-06-02T12:44:35.030Z",
     attachmentMediaList = emptyList(),
   )
 )

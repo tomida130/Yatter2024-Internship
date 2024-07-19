@@ -17,8 +17,8 @@ object AccountConverter {
     username = Username(json.username),
     displayName = json.displayName,
     note = json.note,
-    avatar = json.avatar.takeIf { it.isNotEmpty() }?.let { URL(it) },
-    header = json.header.takeIf { it.isNotEmpty() }?.let { URL(it) },
+    avatar = json.avatar?.takeIf { it.isNotEmpty() }?.let { URL(it) },
+    header = json.header?.takeIf { it.isNotEmpty() }?.let { URL(it) },
     followingCount = json.followingCount ?: 0,
     followerCount = json.followersCount ?: 0,
   )

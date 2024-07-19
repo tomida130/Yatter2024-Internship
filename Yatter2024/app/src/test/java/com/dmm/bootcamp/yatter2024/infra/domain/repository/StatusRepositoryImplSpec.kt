@@ -40,10 +40,10 @@ class StatusRepositoryImplSpec {
           header = "https://www.google.com",
           followingCount = 100,
           followersCount = 200,
-          createAt = "2023-06-02T12:44:35.030Z"
+          createdAt = "2023-06-02T12:44:35.030Z"
         ),
         content = "content",
-        createAt = "2023-06-02T12:44:35.030Z",
+        createdAt = "2023-06-02T12:44:35.030Z",
         attachmentMediaList = emptyList(),
       )
     )
@@ -95,10 +95,10 @@ class StatusRepositoryImplSpec {
         header = "https://www.google.com",
         followingCount = 0,
         followersCount = 0,
-        createAt = ""
+        createdAt = ""
       ),
       content = content,
-      createAt = "",
+      createdAt = "",
       attachmentMediaList = emptyList(),
     )
 

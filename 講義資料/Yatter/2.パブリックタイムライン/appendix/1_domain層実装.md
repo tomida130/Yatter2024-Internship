@@ -85,8 +85,8 @@ abstract class Account(
   val username: Username, // ユーザー名
   val displayName: String?, // 表示名
   val note: String?, // アカウントノート
-  val avatar: URL, // アバター画像URL
-  val header: URL, // ヘッダー画像URL
+  val avatar: URL?, // アバター画像URL
+  val header: URL?, // ヘッダー画像URL
   val followingCount: Int, // フォロー数
   val followerCount: Int, // フォロワー数
 ) : Entity<AccountId>(id) {
