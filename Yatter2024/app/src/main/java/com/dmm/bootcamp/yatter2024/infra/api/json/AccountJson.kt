@@ -11,7 +11,7 @@ data class AccountJson(
   @Json(name = "note") val note: String?,
   @Json(name = "avatar") val avatar: String,
   @Json(name = "header") val header: String,
-  @Json(name = "following_count") val followingCount: Int,
-  @Json(name = "followers_count") val followersCount: Int,
+  @Json(name = "following_count") val followingCount: Int?,
+  @Json(name = "followers_count") val followersCount: Int?,
   @Json(name = "create_at") val createAt: String
 )

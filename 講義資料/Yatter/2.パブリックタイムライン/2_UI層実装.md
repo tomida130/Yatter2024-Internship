@@ -83,7 +83,7 @@ object StatusConverter {
       id = status.id.value,
       displayName = status.account.displayName ?: "",
       username = status.account.username.value,
-      avatar = status.account.avatar.toString(),
+      avatar = status.account.avatar?.toString(),
       content = status.content,
       attachmentMediaList = MediaConverter.convertToBindingModel(status.attachmentMediaList)
     )
