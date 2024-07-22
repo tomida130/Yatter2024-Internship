@@ -29,7 +29,7 @@ class AccountRepositoryImplSpec {
       header = "https://www.google.com",
       followingCount = 0,
       followersCount = 0,
-      createAt = ""
+      createdAt = ""
     )
 
     val expect = AccountConverter.convertToDomainModel(accountJson)
@@ -59,7 +59,7 @@ class AccountRepositoryImplSpec {
       header = "https://www.google.com",
       followingCount = 0,
       followersCount = 0,
-      createAt = ""
+      createdAt = ""
     )
 
     val expect = AccountConverter.convertToDomainModel(accountJson)

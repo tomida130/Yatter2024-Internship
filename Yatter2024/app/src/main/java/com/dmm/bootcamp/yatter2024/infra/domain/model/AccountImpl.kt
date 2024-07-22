@@ -13,8 +13,8 @@ class AccountImpl(
   username: Username,
   displayName: String?,
   note: String?,
-  avatar: URL,
-  header: URL,
+  avatar: URL?,
+  header: URL?,
   followingCount: Int,
   followerCount: Int,
 ) : Account(
