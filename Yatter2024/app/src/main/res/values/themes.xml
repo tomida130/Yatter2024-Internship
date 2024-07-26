@@ -2,4 +2,12 @@
 <resources>
 
     <style name="Theme.Yatter2024" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+    <style name="Theme.App.SplashOpening" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/pink</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/baseline_downhill_skiing_24</item>
+        <item name="postSplashScreenTheme">@style/Theme.App.SplashOpening</item>
+
+    </style>
+
+
 </resources>
